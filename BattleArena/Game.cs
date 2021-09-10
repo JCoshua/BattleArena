@@ -20,6 +20,9 @@ namespace BattleArena
         bool gameOver;
         int currentScene;
         Character player;
+        Character slime;
+        Character kris;
+        Charater zombie;
         Character[] enemies;
         private int currentEnemyIndex = 0;
         private Character currentEnemy;
@@ -36,6 +39,25 @@ namespace BattleArena
         /// </summary>
         public void Start()
         {
+            player.name = "Player";
+            player.health = 1;
+            player.attackPower = 1;
+            player.defensePower = 1;
+
+            slime.name = "slime";
+            slime.health = 10;
+            slime.attackPower = 1;
+            slime.defensePower = 0;
+
+            zombie.name = "Zom-B";
+            zombie.health = 15;
+            zombie.attackPower = 5;
+            zombie.defensePower = 2;
+
+            kris.name = "guy named kris";
+            kris.health = 25;
+            kris.attackPower = 10;
+            kris.defensePower = 5;
         }
 
         /// <summary>
@@ -119,7 +141,8 @@ namespace BattleArena
         /// </summary>
         void GetPlayerName()
         {
-
+            Console.WriteLine("Hello. Please enter your Name.");
+            player.name = Console.WriteLine();
         }
 
         /// <summary>
