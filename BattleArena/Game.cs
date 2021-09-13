@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace BattleArena
-{// test
+{   
     /// <summary>
     /// Represents any entity that exists in game
     /// </summary>
@@ -20,9 +20,6 @@ namespace BattleArena
         bool gameOver;
         int currentScene = 0;
         Character player;
-        Character slime;
-        Character zombie;
-        Character kris;
         Character[] enemies;
 
         private int currentEnemyIndex = 0;
@@ -53,20 +50,9 @@ namespace BattleArena
             player.attackPower = 1;
             player.defensePower = 1;
 
-            slime.name = "Slime";
-            slime.health = 10;
-            slime.attackPower = 5;
-            slime.defensePower = 0;
-
-            zombie.name = "Zom-B";
-            zombie.health = 20;
-            zombie.attackPower = 15;
-            zombie.defensePower = 5;
-
-            kris.name = "guy named Kris";
-            kris.health = 30;
-            kris.attackPower = 20;
-            kris.defensePower = 10;
+            Character slime = new Character { name = "Slime", health = 10, attackPower = 5, defensePower = 0 };
+            Character zombie = new Character { name = "Zom-B", health = 20, attackPower = 15, defensePower = 5 };
+            Character kris = new Character { name = "guy named Kris", health = 30, attackPower = 20, defensePower = 10};
 
             enemies = new Character[] { slime, zombie, kris };
             ResetEnemy();
