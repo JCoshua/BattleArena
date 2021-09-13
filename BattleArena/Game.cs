@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace BattleArena
-{
+{// test
     /// <summary>
     /// Represents any entity that exists in game
     /// </summary>
