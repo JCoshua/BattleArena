@@ -22,8 +22,11 @@ namespace BattleArena
         Character player;
         Character slime;
         Character kris;
-        Charater zombie;
+        Character zombie;
         Character[] enemies;
+        Character player;
+        Character currentEnemy;
+
         private int currentEnemyIndex = 0;
         private Character currentEnemy;
 
@@ -151,6 +154,19 @@ namespace BattleArena
         /// </summary>
         public void CharacterSelection()
         {
+            input = GetInput("Please Select your class:", "Wizard", "Knight");
+            if (GetInput = 1)
+            {
+                player.health = 50;
+                player.attackPower = 25;
+                player.defensePower = 5;
+            }
+            if (GetInput = 2)
+            {
+                player.health = 75;
+                player.attackPower = 15;
+                player.defensePower = 10;
+            }
         }
 
         /// <summary>
@@ -159,6 +175,9 @@ namespace BattleArena
         /// <param name="character">The character that will have its stats shown</param>
         void DisplayStats(Character character)
         {
+            Console.WriteLine(character.health);
+            Console.WriteLine(character.attackPower);
+            Console.WriteLine(character.defensePower);
         }
 
         /// <summary>
@@ -169,6 +188,14 @@ namespace BattleArena
         /// <returns>The amount of damage done to the defender</returns>
         float CalculateDamage(float attackPower, float defensePower)
         {
+            if (attackPower > defensePower)
+            {
+                return attackPower - defensePower;
+            }
+            else
+            {
+                return 0;
+            }
         }
 
         /// <summary>
@@ -179,6 +206,7 @@ namespace BattleArena
         /// <returns>The amount of damage done to the defender</returns>
         public float Attack(ref Character attacker, ref Character defender)
         {
+            defender.health -= CalculateDamage(attacker, defender);
         }
 
         /// <summary>
@@ -186,6 +214,7 @@ namespace BattleArena
         /// </summary>
         public void Battle()
         {
+            DisplayStats()
         }
 
         /// <summary>
