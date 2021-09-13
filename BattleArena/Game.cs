@@ -248,7 +248,7 @@ namespace BattleArena
             }
             else
             {
-                return 0;
+                return 1;
             }
         }
 
@@ -262,6 +262,12 @@ namespace BattleArena
         {
             float damageTaken = CalculateDamage(attacker.attackPower, defender.defensePower);
             defender.health -= damageTaken;
+
+            if (defender.health == 0)
+            {
+                defender.health = 0;
+            }
+
             return damageTaken;
         }
 
@@ -272,20 +278,25 @@ namespace BattleArena
         {
             DisplayStats(player);
             DisplayStats(currentEnemy);
+            float damageDealt;
 
             int input = GetInput("A " + currentEnemy.name + " stands in front of you. What will you do?","Attack", "Dodge");
             if (input == 1)
             {
-                float damageDealt = Attack(ref player, ref currentEnemy);
+                damageDealt = Attack(ref player, ref currentEnemy);
                 Console.WriteLine("You dealt " + damageDealt + " damage to " + currentEnemy.name + ".");
 
-                damageDealt = Attack(ref currentEnemy, ref player);
-                Console.WriteLine("You took " + damageDealt + " damage.");
+                
             }
             if (input == 2)
             {
                 Console.WriteLine("You rolled out of the way.");
+                return;
             }
+
+
+            damageDealt = Attack(ref currentEnemy, ref player);
+            Console.WriteLine("You took " + damageDealt + " damage.");
             CheckBattleResults();
         }
 
