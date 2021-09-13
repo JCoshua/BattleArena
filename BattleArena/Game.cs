@@ -53,20 +53,20 @@ namespace BattleArena
             player.attackPower = 1;
             player.defensePower = 1;
 
-            slime.name = "slime";
+            slime.name = "Slime";
             slime.health = 10;
-            slime.attackPower = 1;
+            slime.attackPower = 5;
             slime.defensePower = 0;
 
             zombie.name = "Zom-B";
-            zombie.health = 15;
-            zombie.attackPower = 5;
-            zombie.defensePower = 2;
+            zombie.health = 20;
+            zombie.attackPower = 15;
+            zombie.defensePower = 5;
 
-            kris.name = "guy named kris";
-            kris.health = 25;
-            kris.attackPower = 10;
-            kris.defensePower = 5;
+            kris.name = "guy named Kris";
+            kris.health = 30;
+            kris.attackPower = 20;
+            kris.defensePower = 10;
 
             enemies = new Character[] { slime, zombie, kris };
             ResetEnemy();
@@ -205,8 +205,14 @@ namespace BattleArena
         /// </summary>
         void GetPlayerName()
         {
-            Console.WriteLine("Hello. Please enter your Name.");
-            player.name = Console.ReadLine();
+            int input = 2;
+            while (input != 1)
+            {
+                Console.WriteLine("Hello. Please enter your Name.");
+                player.name = Console.ReadLine();
+                input = GetInput("Are you okay with this name?", "Yes", "No");
+            }
+
         }
 
         /// <summary>
@@ -303,12 +309,14 @@ namespace BattleArena
         /// </summary>
         void CheckBattleResults()
         {
+            //If the player somehow loses
             if (player.health <= 0)
             {
-                gameOver = true;
+                Console.WriteLine("\nYou Died");
+                currentScene = 2;
             }
 
-            //If Monster 2 dies...
+            //If the enemy dies...
             if (currentEnemy.health <= 0)
             {
                 Console.WriteLine("\nYou slayed the " + currentEnemy.name + "!");
