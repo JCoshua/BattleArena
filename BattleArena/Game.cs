@@ -3,27 +3,18 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace BattleArena
-{   
-    /// <summary>
-    /// Represents any entity that exists in game
-    /// </summary>
-    struct Character
-    {
-        public string name;
-        public float health;
-        public float attackPower;
-        public float defensePower;
-    }
+{  
 
     class Game
     {
-        bool gameOver;
-        int currentScene = 0;
-        Character player;
-        Character[] enemies;
+        private bool _gameOver;
+        private int _currentScene = 0;
+        private Entity _player;
+        private Entity[] _enemies;
+        private string _playerName;
 
-        private int currentEnemyIndex = 0;
-        private Character currentEnemy;
+        private int _currentEnemyIndex = 0;
+        private Entity _currentEnemy;
 
         /// <summary>
         /// Function that starts the main game loop
@@ -32,7 +23,7 @@ namespace BattleArena
         {
             Start();
 
-            while (!gameOver)
+            while (!_gameOver)
             {
                 Update();
             }
@@ -45,16 +36,18 @@ namespace BattleArena
         /// </summary>
         public void Start()
         {
-            player.name = "Player";
-            player.health = 1;
-            player.attackPower = 1;
-            player.defensePower = 1;
+            _gameOver = false;
+            _currentScene = 0;
+            InitializeEnemies();
+        }
 
-            Character slime = new Character { name = "Slime", health = 10, attackPower = 5, defensePower = 0 };
-            Character zombie = new Character { name = "Zom-B", health = 20, attackPower = 15, defensePower = 5 };
-            Character kris = new Character { name = "guy named Kris", health = 30, attackPower = 20, defensePower = 10};
+        public void InitializeEnemies()
+        {
+            Entity slime = new Entity("Slime", 10, 5, 0);
+            Entity zombie = new Entity("Zom-B", 20, 15, 5);
+            Entity kris = new Entity("guy named Kris", 30, 20, 10);
 
-            enemies = new Character[] { slime, zombie, kris };
+            _enemies = new Entity[] { slime, zombie, kris };
             ResetEnemy();
         }
 
@@ -80,8 +73,8 @@ namespace BattleArena
         /// </summary>
         void ResetEnemy()
         {
-            currentEnemyIndex = 0;
-            currentEnemy = enemies[currentEnemyIndex];
+            _currentEnemyIndex = 0;
+            _currentEnemy = _enemies[_currentEnemyIndex];
         }
 
         /// <summary>
@@ -136,7 +129,7 @@ namespace BattleArena
         /// </summary>
         void DisplayCurrentScene()
         {
-            switch (currentScene)
+            switch (_currentScene)
             {
                 case 0:
                     DisplayMainMenu();
@@ -165,7 +158,7 @@ namespace BattleArena
         {
             GetPlayerName();
             CharacterSelection();
-            currentScene = 1;
+            _currentScene = 1;
         }
 
         /// <summary>
@@ -176,12 +169,12 @@ namespace BattleArena
            int input = GetInput("Would you like to play again?", "Yes", "No");
             if (input == 1)
             {
-                ResetEnemy();
-                currentScene = 0;
+                InitializeEnemies();
+                _currentScene = 0;
             }
             else if (input == 2)
             {
-                gameOver = true;
+                _gameOver = true;
             }
         }
 
@@ -195,7 +188,7 @@ namespace BattleArena
             while (input != 1)
             {
                 Console.WriteLine("Hello. Please enter your Name.");
-                player.name = Console.ReadLine();
+                _playerName = Console.ReadLine();
                 input = GetInput("Are you okay with this name?", "Yes", "No");
             }
 
@@ -210,15 +203,11 @@ namespace BattleArena
             int input = GetInput("Please Select your class:", "Wizard", "Knight");
             if (input == 1)
             {
-                player.health = 50;
-                player.attackPower = 25;
-                player.defensePower = 5;
+                _player = new Entity(_playerName, 50, 25, 5);
             }
             else if (input == 2)
             {
-                player.health = 75;
-                player.attackPower = 15;
-                player.defensePower = 10;
+                _player = new Entity(_playerName, 75, 15, 10);
             }
         }
 
@@ -226,65 +215,26 @@ namespace BattleArena
         /// Prints a characters stats to the console
         /// </summary>
         /// <param name="character">The character that will have its stats shown</param>
-        void DisplayStats(Character character)
+        void DisplayStats(Entity character)
         {
-            Console.WriteLine(character.name + " Health: " + character.health);
-            Console.WriteLine(character.name + " Attack: " + character.attackPower);
-            Console.WriteLine(character.name + " Defence: " + character.defensePower);
+            Console.WriteLine(character.Name + " Health: " + character.Health);
+            Console.WriteLine(character.Name + " Attack: " + character.AttackPower);
+            Console.WriteLine(character.Name + " Defence: " + character.DefensePower);
             Console.WriteLine();
         }
 
-        /// <summary>
-        /// Calculates the amount of damage that will be done to a character
-        /// </summary>
-        /// <param name="attackPower">The attacking character's attack power</param>
-        /// <param name="defensePower">The defending character's defense power</param>
-        /// <returns>The amount of damage done to the defender</returns>
-        float CalculateDamage(float attackPower, float defensePower)
-        {
-            if (attackPower > defensePower)
-            {
-                return attackPower - defensePower;
-            }
-            else
-            {
-                return 1;
-            }
-        }
-
-        /// <summary>
-        /// Deals damage to a character based on an attacker's attack power
-        /// </summary>
-        /// <param name="attacker">The character that initiated the attack</param>
-        /// <param name="defender">The character that is being attacked</param>
-        /// <returns>The amount of damage done to the defender</returns>
-        public float Attack(ref Character attacker, ref Character defender)
-        {
-            float damageTaken = CalculateDamage(attacker.attackPower, defender.defensePower);
-            defender.health -= damageTaken;
-
-            if (defender.health == 0)
-            {
-                defender.health = 0;
-            }
-
-            return damageTaken;
-        }
-
-        /// <summary>
-        /// Simulates one turn in the current monster fight
-        /// </summary>
+        
         public void Battle()
         {
-            DisplayStats(player);
-            DisplayStats(currentEnemy);
-            float damageDealt;
+            DisplayStats(_player);
+            DisplayStats(_currentEnemy);
+            float damageDealt = 0;
 
-            int input = GetInput("A " + currentEnemy.name + " stands in front of you. What will you do?","Attack", "Dodge");
+            int input = GetInput("A " + _currentEnemy.Name + " stands in front of you. What will you do?","Attack", "Dodge");
             if (input == 1)
             {
-                damageDealt = Attack(ref player, ref currentEnemy);
-                Console.WriteLine("You dealt " + damageDealt + " damage to " + currentEnemy.name + ".");
+                damageDealt = _player.Attack(_currentEnemy);
+                Console.WriteLine("You dealt " + damageDealt + " damage to " + _currentEnemy.Name + ".");
 
                 
             }
@@ -295,7 +245,7 @@ namespace BattleArena
             }
 
 
-            damageDealt = Attack(ref currentEnemy, ref player);
+            damageDealt = _currentEnemy.Attack(_player);
             Console.WriteLine("You took " + damageDealt + " damage.");
             CheckBattleResults();
         }
@@ -307,26 +257,26 @@ namespace BattleArena
         void CheckBattleResults()
         {
             //If the player somehow loses
-            if (player.health <= 0)
+            if (_player.Health <= 0)
             {
                 Console.WriteLine("\nYou Died");
-                currentScene = 2;
+                _currentScene = 2;
             }
 
             //If the enemy dies...
-            if (currentEnemy.health <= 0)
+            if (_currentEnemy.Health <= 0)
             {
-                Console.WriteLine("\nYou slayed the " + currentEnemy.name + "!");
+                Console.WriteLine("\nYou slayed the " + _currentEnemy.Name + "!");
 
-                currentEnemyIndex++;
-                if (currentEnemyIndex >= enemies.Length)
+                _currentEnemyIndex++;
+                if (_currentEnemyIndex >= _enemies.Length)
                 {
                     Console.WriteLine("\nCongratulation, You Win!");
-                    currentScene = 2;
+                    _currentScene = 2;
                 }
                 else
                 {
-                    currentEnemy = enemies[currentEnemyIndex];
+                    _currentEnemy = _enemies[_currentEnemyIndex];
                 }
             }
         }
