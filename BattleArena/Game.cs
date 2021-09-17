@@ -4,18 +4,26 @@ using System.Text;
 
 namespace BattleArena
 {  
+    public struct Item
+    {
+        public string Name;
+        public float StatBoost;
+    }
 
     class Game
     {
         private bool _gameOver;
         private int _currentScene = 0;
-        private Entity _player;
+        private Player _player;
         private Entity[] _enemies;
         private string _playerName;
 
         private int _currentEnemyIndex = 0;
         private Entity _currentEnemy;
 
+
+        private Item[] _wizardItems;
+        private Item[] _knightItems;
         /// <summary>
         /// Function that starts the main game loop
         /// </summary>
@@ -39,13 +47,29 @@ namespace BattleArena
             _gameOver = false;
             _currentScene = 0;
             InitializeEnemies();
+            IntitalizeItems();
+        }
+
+        public void IntitalizeItems()
+        {   
+            //Wizard Items
+            Item bigWand = new Item { Name = "Big Wand", StatBoost = 5 };
+            Item bigShield = new Item { Name = "Big Shield", StatBoost = 15 };
+
+            //Knight Items
+            Item maghoganyStick = new Item { Name = "Mahogany Stick", StatBoost = 25 };
+            Item shoes = new Item { Name = "Rubber Shoes", StatBoost = 20 };
+
+            //Initalize arrays
+            _wizardItems = new Item[] { bigWand, bigShield };
+            _knightItems = new Item[] { maghoganyStick, shoes };
         }
 
         public void InitializeEnemies()
         {
             Entity slime = new Entity("Slime", 10, 5, 0);
-            Entity zombie = new Entity("Zom-B", 20, 15, 5);
-            Entity kris = new Entity("guy named Kris", 30, 20, 10);
+            Entity zombie = new Entity("Zom-B", 20, 25, 5);
+            Entity kris = new Entity("guy named Kris", 30, 15, 20);
 
             _enemies = new Entity[] { slime, zombie, kris };
             ResetEnemy();
@@ -84,44 +108,20 @@ namespace BattleArena
         /// <param name="option1">The first option the player can choose</param>
         /// <param name="option2">The second option the player can choose</param>
         /// <returns></returns>
-        int GetInput(string description, string option1, string option2)
+        int GetInput(string description, params string[] options)
         {
             string input = "";
-            int inputReceived = 0;
+            int inputReceived = -1;
 
-            while (inputReceived != 1 && inputReceived != 2)
-            {//Print options
+            while (inputReceived = -1)
+            {
+                //Print options
                 Console.WriteLine(description);
-                Console.WriteLine("1. " + option1);
-                Console.WriteLine("2. " + option2);
-                Console.Write("> ");
-
-                //Get input from player
-                input = Console.ReadLine();
-
-                //If player selected the first option...
-                if (input == "1" || input == option1)
+                for (int i = 0; i < options.Length; i++)
                 {
-                    //Set input received to be the first option
-                    inputReceived = 1;
+                    Console.WriteLine((i + 1) + ". " + options[i]);
                 }
-                //Otherwise if the player selected the second option...
-                else if (input == "2" || input == option2)
-                {
-                    //Set input received to be the second option
-                    inputReceived = 2;
-                }
-                //If neither are true...
-                else
-                {
-                    //...display error message
-                    Console.WriteLine("Invalid Input");
-                    Console.ReadKey();
-                }
-
-                Console.Clear();
             }
-            return inputReceived;
         }
 
         /// <summary>
@@ -203,11 +203,11 @@ namespace BattleArena
             int input = GetInput("Please Select your class:", "Wizard", "Knight");
             if (input == 1)
             {
-                _player = new Entity(_playerName, 50, 25, 5);
+                _player = new Player(_playerName, 50, 25, 5, _wizardItems);
             }
             else if (input == 2)
             {
-                _player = new Entity(_playerName, 75, 15, 10);
+                _player = new Player(_playerName, 75, 15, 10, _knightItems);
             }
         }
 
@@ -225,10 +225,12 @@ namespace BattleArena
 
         
         public void Battle()
-        {
+        {   
+            float damageDealt = 0;
+
             DisplayStats(_player);
             DisplayStats(_currentEnemy);
-            float damageDealt = 0;
+            
 
             int input = GetInput("A " + _currentEnemy.Name + " stands in front of you. What will you do?","Attack", "Dodge");
             if (input == 1)

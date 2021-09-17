@@ -13,26 +13,22 @@ namespace BattleArena
 
         public string Name
         {
-            get
-            { return _name; }
+            get { return _name; }
         }
 
         public float Health
         {
-            get
-            { return _health; }
+            get { return _health; }
         }
 
         public float AttackPower
         {
-            get
-            { return _attackPower; }
+            get { return _attackPower; }
         }
 
         public float DefensePower
         {
-            get
-            { return _defensePower; }
+            get { return _defensePower; }
         }
 
         public Entity()
@@ -68,7 +64,7 @@ namespace BattleArena
             
         }
         
-        public float Attack(Entity defender)
+        public virtual float Attack(Entity defender)
             {
                 return defender.TakeDamage(AttackPower);
             }
