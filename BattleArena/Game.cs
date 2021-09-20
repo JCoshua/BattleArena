@@ -12,6 +12,14 @@ namespace BattleArena
         NA
     }
 
+    public enum Scene
+    {
+        STARTMENU,
+        CHARACTERSELECTION,
+        BATTLE,
+        RESTARTMENU
+    }
+
     public struct Item
     {
         public string Name;
@@ -22,7 +30,7 @@ namespace BattleArena
     class Game
     {
         private bool _gameOver;
-        private int _currentScene = 0;
+        private Scene _currentScene = 0;
         private Player _player;
         private Entity[] _enemies;
         private string _playerName;
@@ -116,6 +124,71 @@ namespace BattleArena
             //Closes after finishing
             writer.Close();
         }
+
+        public bool Load()
+        {
+            bool loadSuccessful = true;
+            //File doesn't exist
+            if (!File.Exists("SaveData.txt"))
+                loadSuccessful = false;
+
+            //Creates new reader
+            StreamReader reader = new StreamReader("SaveData.txt");
+
+            //If the first line can't be converted into an int
+            if (!int.TryParse(reader.ReadLine(), out _currentEnemyIndex))
+                loadSuccessful = false;
+
+            //Load player Name and job
+            string job = reader.ReadLine();
+
+            //Assign items based on player job
+            if (!(job == "Wizard"))
+                _player = new Player(_wizardItems);
+            else if (job == "Knight")
+                _player = new Player(_knightItems);
+            else
+                loadSuccessful = false;
+
+            if (!_player.Load(reader))
+                loadSuccessful = false;
+
+            //Create a new instance and try to load the player
+            _currentEnemy = new Entity();
+            if (!_currentEnemy.Load(reader))
+                loadSuccessful = false;
+
+            _enemies[_currentEnemyIndex] = _currentEnemy;
+
+            reader.Close();
+            return loadSuccessful;
+        }
+
+        public void DisplayOpeningMenu()
+            {
+            int choice = GetInput("Welcome to the Battle Arena", "Start New Game", "Load Game");
+
+            if (choice == 0)
+            {
+                _currentScene = Scene.CHARACTERSELECTION;
+            }
+            else if (choice == 1)
+            {
+                if (Load())
+                {
+                    Console.WriteLine("Loading Successful");
+                    Console.ReadKey(true);
+                    Console.Clear();
+                    _currentScene = Scene.BATTLE;
+                }
+                else
+                {
+                    Console.WriteLine("Woops, something messed up");
+                    Console.ReadKey(true);
+                    Console.Clear();
+                }
+            }
+        }
         /// <summary>
         /// Resets the enemies
         /// </summary>
@@ -184,17 +257,21 @@ namespace BattleArena
         {
             switch (_currentScene)
             {
-                case 0:
+                case Scene.STARTMENU:
+                    DisplayOpeningMenu();
+                    break;
+
+                case Scene.CHARACTERSELECTION:
                     DisplayMainMenu();
                     break;
 
-                case 1:
+                case Scene.BATTLE:
                     Battle();
                     Console.ReadKey(true);
                     Console.Clear();
                     break;
 
-                case 2:
+                case Scene.RESTARTMENU:
                     DisplayRestartMenu();
                     break;
 
@@ -211,7 +288,7 @@ namespace BattleArena
         {
             GetPlayerName();
             CharacterSelection();
-            _currentScene = 1;
+            _currentScene = Scene.BATTLE;
         }
 
         /// <summary>
@@ -223,7 +300,7 @@ namespace BattleArena
             if (input == 0)
             {
                 InitializeEnemies();
-                _currentScene = 0;
+                _currentScene = Scene.CHARACTERSELECTION;
             }
             else if (input == 1)
             {
@@ -264,11 +341,11 @@ namespace BattleArena
             int input = GetInput("Please Select your class:", "Wizard", "Knight");
             if (input == 0)
             {
-                _player = new Player(_playerName, 50, 25, 5, _wizardItems);
+                _player = new Player(_playerName, 50, 25, 5, _wizardItems, "Wizard");
             }
             else if (input == 1)
             {
-                _player = new Player(_playerName, 75, 15, 10, _knightItems);
+                _player = new Player(_playerName, 75, 15, 10, _knightItems, "Knight");
             }
         }
 
@@ -340,7 +417,6 @@ namespace BattleArena
                 Console.Clear();
                 Save();
                 Console.WriteLine("Saved Game");
-                Console.ReadKey(true);
                 return;
             }
 
@@ -359,7 +435,7 @@ namespace BattleArena
             if (_player.Health <= 0)
             {
                 Console.WriteLine("\nYou Died");
-                _currentScene = 2;
+                _currentScene = Scene.RESTARTMENU;
             }
 
             //If the enemy dies...
@@ -371,7 +447,7 @@ namespace BattleArena
                 if (_currentEnemyIndex >= _enemies.Length)
                 {
                     Console.WriteLine("\nCongratulation, You Win!");
-                    _currentScene = 2;
+                    _currentScene = Scene.RESTARTMENU;
                 }
                 else
                 {

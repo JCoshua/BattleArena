@@ -10,6 +10,7 @@ namespace BattleArena
         private Item[] _items;
         private Item _currentItem;
         private int _currentItemIndex;
+        private string _job;
 
         public override float AttackPower
         {
@@ -97,10 +98,58 @@ namespace BattleArena
             return itemNames;
         }
 
+        public string Job
+        {
+            get
+            {
+                return _job;
+            }
+            set
+            {
+                Job = value;
+            }
+        }
+
+        public Player()
+        {
+            _items = new Item[0];
+            _currentItem.Name = "nothing";
+        }
+
+        public Player(Item[] items) : base()
+        {
+            _currentItem.Name = "Nothing";
+            _items = items;
+            _currentItemIndex = -1;
+        }
+
+        public Player(string name, float health, float attackPower, float defensePower, Item[] items, string job) : base(name, health, attackPower, defensePower)
+        {
+            _items = items;
+            _currentItem.Name = "nothing";
+            _job = job;
+        }
+
         public override void Save(StreamWriter writer)
         {
+            writer.WriteLine(_job);
             base.Save(writer);
             writer.WriteLine(_currentItemIndex);
+            
+        }
+
+        public override bool Load(StreamReader reader)
+        {
+           // If the base Load Function fails
+            if (!base.Load(reader))
+                return false;
+
+            // If the current line can't be converted into an int
+            if (!int.TryParse(reader.ReadLine(), out _currentItemIndex))
+                return false;
+
+            //Reutrn whether or not the item was equipped successfully
+            return TryEquipItem(_currentItemIndex);
         }
     }
 }
