@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
 
 namespace BattleArena
 {
@@ -68,5 +69,13 @@ namespace BattleArena
             {
                 return defender.TakeDamage(AttackPower);
             }
+
+        public virtual void Save(StreamWriter writer)
+        {
+            writer.WriteLine(_name);
+            writer.WriteLine(_health);
+            writer.WriteLine(_attackPower);
+            writer.WriteLine(_defensePower);
+        }
     }
 }

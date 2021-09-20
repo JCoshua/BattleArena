@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
 
 namespace BattleArena
 {  
@@ -8,14 +9,14 @@ namespace BattleArena
     {
         DEFENSE,
         ATTACK,
-        N/A,
+        NA
     }
 
     public struct Item
     {
         public string Name;
         public float StatBoost;
-        public int ItemType;
+        public ItemType Type;
     }
 
     class Game
@@ -61,12 +62,12 @@ namespace BattleArena
         public void IntitalizeItems()
         {   
             //Wizard Items
-            Item bigWand = new Item { Name = "Big Wand", StatBoost = 5 , ItemType = 0};
-            Item bigShield = new Item { Name = "Big Shield", StatBoost = 15, ItemType = 1 };
+            Item bigWand = new Item { Name = "Big Wand", StatBoost = 5, Type = ItemType.ATTACK };
+            Item bigShield = new Item { Name = "Big Shield", StatBoost = 15, Type = ItemType.DEFENSE };
 
             //Knight Items
-            Item maghoganyStick = new Item { Name = "Mahogany Stick", StatBoost = 25 , ItemType = 0 };
-            Item shoes = new Item { Name = "Rubber Shoes", StatBoost = 20 , ItemType = 1 };
+            Item maghoganyStick = new Item { Name = "Mahogany Stick", StatBoost = 25 , Type = ItemType.ATTACK };
+            Item shoes = new Item { Name = "Rubber Shoes", StatBoost = 20 , Type = ItemType.DEFENSE };
 
             //Initalize arrays
             _wizardItems = new Item[] { bigWand, bigShield };
@@ -100,6 +101,21 @@ namespace BattleArena
             Console.WriteLine("Farewell... Coward.");
         }
 
+        public void Save()
+        {
+            //Creates a new stream writer
+            StreamWriter writer = new StreamWriter("SaveData.txt");
+
+            //Saves current enemy index
+            writer.WriteLine(_currentEnemyIndex);
+
+            //Saves player and Enemy Stats
+            _player.Save(writer);
+            _currentEnemy.Save(writer);
+
+            //Closes after finishing
+            writer.Close();
+        }
         /// <summary>
         /// Resets the enemies
         /// </summary>
@@ -293,7 +309,7 @@ namespace BattleArena
             DisplayStats(_currentEnemy);
             
 
-            int input = GetInput("A " + _currentEnemy.Name + " stands in front of you. What will you do?","Attack", "Equip Item", "Remove Current Item");
+            int input = GetInput("A " + _currentEnemy.Name + " stands in front of you. What will you do?","Attack", "Equip Item", "Remove Current Item", "Save");
             if (input == 0)
             {
                 damageDealt = _player.Attack(_currentEnemy);
@@ -305,9 +321,28 @@ namespace BattleArena
             {
                 Console.Clear();
                 DisplayEquipMenu();
+                Console.ReadKey(true);
                 return;
             }
+            else if (input == 2)
+            {
+                Console.Clear();
+                if (!_player.TryUnequip())
+                    Console.WriteLine("You have nothing equipped!");
 
+                else
+                    Console.WriteLine("You placed the item in your bag");
+
+                return;
+            }
+            else if (input == 3)
+            {
+                Console.Clear();
+                Save();
+                Console.WriteLine("Saved Game");
+                Console.ReadKey(true);
+                return;
+            }
 
             damageDealt = _currentEnemy.Attack(_player);
             Console.WriteLine("You took " + damageDealt + " damage.");
